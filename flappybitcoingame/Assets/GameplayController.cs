@@ -7,25 +7,24 @@ public class GameplayController : MonoBehaviour {
 	public ScalePair[] spriteScales;
 
 	bool _isGameActive;
-
-	int _numObstacleTypes = 3;
-	float _timeUntilSpawn = 4;
+	
+	public float timeUntilSpawn;
 	float _elapsedTime = 0;
 
-	int _previousObstacle = -1;
-	public int score;
+	public float gapHeight;
+	public float topPillarMaxOffset;
 
-	GameObject _smallObamaPrefab;
-	GameObject _mediumObamaPrefab;
-	GameObject _largeObamaPrefab;
+	public int score;
+	
+	GameObject _enemyPillarPrefab;
+
+
+
 
 	// Use this for initialization
 	void Start () {
 		_isGameActive = false;
-
-		_smallObamaPrefab = Resources.Load<GameObject> ("Prefabs/ObamaSmall");
-		_mediumObamaPrefab = Resources.Load<GameObject> ("Prefabs/ObamaMedium");
-		_largeObamaPrefab = Resources.Load<GameObject> ("Prefabs/ObamaLarge");
+		_enemyPillarPrefab = Resources.Load<GameObject> ("Prefabs/EnemyPillar");
 
 		score = 0;
 	}
@@ -35,82 +34,48 @@ public class GameplayController : MonoBehaviour {
 		if (!_isGameActive && Input.GetButton ("Fire1")) {
 			_isGameActive = true;
 			BroadcastMessage("ActivateGame");
-			SpawnObstacle();
+			SpawnDynamicObstacles();
 		}
 
 		if (_isGameActive) {
 			_elapsedTime += Time.deltaTime;
 
-			if (_elapsedTime >= _timeUntilSpawn) {
+			if (_elapsedTime >= timeUntilSpawn) {
 				_elapsedTime = 0;
-				SpawnObstacle ();
+				SpawnDynamicObstacles ();
 			}
 		}
 
 
 	}
 
-	void SpawnObstacle() {
-		int obstacleType = _previousObstacle;
-		while (obstacleType == _previousObstacle) {
-			obstacleType = Random.Range (0, _numObstacleTypes);
-		}
 
-		switch (obstacleType) {
-			case 0:
-			SpawnSmallObstacle();
-			break;
-		case 1:
-			SpawnMediumObstacle();
-			break;
-		case 2:
-			SpawnLargeObstacle();
-			break;
-			
-		}
-	}
+	void SpawnDynamicObstacles() {
 
-	void SpawnSmallObstacle() {
-		ObstacleContainerController smallObama = ((GameObject)(Instantiate(_smallObamaPrefab, new Vector3(2, 2.04f, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
-		ObstacleContainerController largeObama = ((GameObject)(Instantiate(_largeObamaPrefab, new Vector3(2, 0, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
+		// Spawn Pillars
+		ObstacleContainerController topPillar = ((GameObject)(Instantiate(_enemyPillarPrefab, new Vector3(2, 8.65f, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
+		ObstacleContainerController bottomPillar = ((GameObject)(Instantiate(_enemyPillarPrefab, new Vector3(2, 8.65f, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
 
 
+		// Configure Pillar Properties
 		int rand = Random.Range (0, enemySprites.Length);
 		Sprite sprite = enemySprites[rand];
-		smallObama.SetSprite(sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
-		smallObama.tracksScore = true;
-		largeObama.SetSprite(sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
-		largeObama.SetGameplayController (this);
-		smallObama.SetGameplayController (this);
 
+		topPillar.SetSprite (sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
+		bottomPillar.SetSprite (sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
+		topPillar.SetGameplayController (this);
+		bottomPillar.SetGameplayController (this);
+		topPillar.tracksScore = true;
+
+		// Configure Pillar Offsets
+		float offset = Random.Range (8, topPillarMaxOffset * 10);
+		offset /= 10;
+		topPillar.transform.position = new Vector3 (topPillar.transform.position.x, topPillar.transform.position.y - offset, topPillar.transform.position.z);
+		bottomPillar.transform.position = new Vector3 (topPillar.transform.position.x, topPillar.transform.position.y - gapHeight - 6.5f, topPillar.transform.position.z);
+		
 	}
 
-	void SpawnMediumObstacle() {
-		ObstacleContainerController mediumObama = ((GameObject)(Instantiate(_mediumObamaPrefab, new Vector3(2, 2.04f, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
-		ObstacleContainerController mediumObama2 = ((GameObject)(Instantiate(_mediumObamaPrefab, new Vector3(2, -1, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
 
-		int rand = Random.Range (0, enemySprites.Length);
-		Sprite sprite = enemySprites[rand];
-		mediumObama.SetSprite(sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
-		mediumObama2.SetSprite(sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
-		mediumObama.SetGameplayController (this);
-		mediumObama2.SetGameplayController (this);
-		mediumObama.tracksScore = true;
-	}
-
-	void SpawnLargeObstacle() {
-		ObstacleContainerController largeObama = ((GameObject)(Instantiate(_largeObamaPrefab, new Vector3(2, 2.04f, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
-		ObstacleContainerController smallObama = ((GameObject)(Instantiate(_smallObamaPrefab, new Vector3(2, -2.1f, 0), UnityEngine.Quaternion.identity))).GetComponent<ObstacleContainerController>();
-
-		int rand = Random.Range (0, enemySprites.Length);
-		Sprite sprite = enemySprites[rand];
-		largeObama.SetSprite (sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
-		smallObama.SetSprite (sprite, spriteScales[rand].scaleX, spriteScales[rand].scaleY, spriteScales[rand].rectX, spriteScales[rand].rectY);
-		largeObama.SetGameplayController (this);
-		smallObama.SetGameplayController (this);
-		largeObama.tracksScore = true;
-
-	}
 
 	public void AddScore() {
 		score++;

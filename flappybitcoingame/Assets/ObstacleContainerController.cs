@@ -4,7 +4,6 @@ using System.Collections;
 public class ObstacleContainerController : MonoBehaviour {
 
 	float _scrollSpeed = .5f;
-	Sprite _sprite;
 	bool _hasBeenScored;
 	GameplayController _gameplayController;
 
@@ -34,7 +33,6 @@ public class ObstacleContainerController : MonoBehaviour {
 	}
 
 	public void SetSprite(Sprite sprite, float x, float y, float rectX, float rectY) {
-		this._sprite = sprite;
 		SpriteAndScale sands = new SpriteAndScale ();
 		sands.sprite = sprite;
 		sands.x = x;
