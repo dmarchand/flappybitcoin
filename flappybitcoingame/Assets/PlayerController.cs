@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
 	public Sprite[] sprites;
+
 	public float framesPerSecond;
 	public float forcePerClick;
 	
@@ -49,4 +51,6 @@ public class PlayerController : MonoBehaviour {
 		_isActive = true;
 		_rigidBody.WakeUp ();
 	}
+
+
 }
