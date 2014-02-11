@@ -40,11 +40,15 @@ public class PlayerController : MonoBehaviour {
 			this._rigidBody.velocity = new Vector2 (0, forcePerClick * 10);
 			_isMovingUp = true;
 		}
+
+		if (this.transform.position.y > 3.0f || this.transform.position.y < -3.0f) {
+			Application.LoadLevel(0);
+		}
 	}
 
 	void OnCollisionEnter2D() {
 		Application.LoadLevel(0);
-		Debug.Log ("Collision");
+		//Debug.Log ("Collision");
 	}
 
 	void ActivateGame() {
