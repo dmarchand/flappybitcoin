@@ -26,7 +26,7 @@ public class ObstacleContainerController : MonoBehaviour {
 			Destroy(this.gameObject);
 		}
 
-		if (!_hasBeenScored && tracksScore && transform.position.x <= -0.5) {
+		if (!_hasBeenScored && tracksScore && transform.position.x <= -1.5) {
 			_hasBeenScored = true;
 			_gameplayController.AddScore();
 		}

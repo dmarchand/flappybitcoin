@@ -13,10 +13,12 @@ public class GameplayController : MonoBehaviour {
 
 	public float gapHeight;
 	public float topPillarMaxOffset;
+	public int pickupSpawnChance;
 
 	public int score;
 	
 	GameObject _enemyPillarPrefab;
+	GameObject _powerupPrefab;
 
 
 
@@ -25,6 +27,7 @@ public class GameplayController : MonoBehaviour {
 	void Start () {
 		_isGameActive = false;
 		_enemyPillarPrefab = Resources.Load<GameObject> ("Prefabs/EnemyPillar");
+		_powerupPrefab = Resources.Load<GameObject> ("Prefabs/Powerup");
 
 		score = 0;
 	}
@@ -42,13 +45,21 @@ public class GameplayController : MonoBehaviour {
 
 			if (_elapsedTime >= timeUntilSpawn) {
 				_elapsedTime = 0;
-				SpawnDynamicObstacles ();
+				SpawnDynamicObstacles();
+				SpawnPickups();
 			}
 		}
 
 
 	}
 
+	void SpawnPickups() {
+		if (Random.Range (0, 100) > pickupSpawnChance) {
+			float yPosition = Random.Range(-20, 765) / 10;
+
+			PowerupController topPillar = ((GameObject)(Instantiate(_enemyPillarPrefab, new Vector3(2, yPosition, 0), UnityEngine.Quaternion.identity))).GetComponent<PowerupController>();
+		}
+	}
 
 	void SpawnDynamicObstacles() {
 
