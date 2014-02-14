@@ -6,14 +6,21 @@ public class ObstacleController : MonoBehaviour {
 	float _scrollSpeed = .7f;
 	Sprite sprite;
 	SpriteRenderer _spriteRenderer;
+	GameplayController _gameplayController;
 
 	// Use this for initialization
 	void Start () {
 		_spriteRenderer = renderer as SpriteRenderer;
+		_gameplayController = FindObjectOfType<GameplayController> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+		if (_gameplayController.IsGameDisabled) {
+			return;
+		}
+
 		Vector3 newPosition = new Vector3();
 		float currentSpeed = _scrollSpeed;
 		newPosition.Set(transform.position.x - Time.deltaTime * currentSpeed, transform.position.y, transform.position.z);
@@ -32,6 +39,7 @@ public class ObstacleController : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other){
 		Application.LoadLevel(0);
 		//Debug.Log ("Collision");
+
 	}
 
 	void PowerupEnable() {

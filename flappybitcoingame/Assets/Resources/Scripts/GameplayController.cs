@@ -6,7 +6,7 @@ public class GameplayController : MonoBehaviour {
 	public Sprite[] enemySprites;
 	public ScalePair[] spriteScales;
 
-	bool _isGameActive;
+	public bool isGameActive;
 	bool _powerupEnabled;
 	
 	public float timeUntilSpawn;
@@ -23,27 +23,65 @@ public class GameplayController : MonoBehaviour {
 	GameObject _enemyPillarPrefab;
 	GameObject _powerupPrefab;
 
+	float _pausedTime = 0f;
 
+	[SerializeField]
+	public bool IsGameOver 
+	{
+		get 
+		{
+			return !isGameActive;
+		}
+	}
+
+	[SerializeField]
+	public bool IsGamePaused {
+		get;
+		set;
+	}
+
+	public bool IsGameDisabled {
+		get 
+		{
+			if(IsGameOver || IsGamePaused) { return true; }
+			return false;
+		}
+	}
 
 
 	// Use this for initialization
 	void Start () {
-		_isGameActive = false;
+		isGameActive = false;
+		IsGamePaused = false;
 		_enemyPillarPrefab = Resources.Load<GameObject> ("Prefabs/EnemyPillar");
 		_powerupPrefab = Resources.Load<GameObject> ("Prefabs/Powerup");
 
 		score = 0;
+		AdMobPlugin.ShowBannerView ();
 	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-		if (!_isGameActive && Input.GetButton ("Fire1")) {
-			_isGameActive = true;
-			BroadcastMessage("ActivateGame");
-			SpawnDynamicObstacles();
+
+	public void StartNewGame() {
+		AdMobPlugin.HideBannerView ();
+		isGameActive = true;
+		BroadcastMessage("ActivateGame");
+		SpawnDynamicObstacles();
+	}
+
+	public void PauseToggle() {
+
+		if (!IsGamePaused) {
+			FindObjectOfType<PlayerController> ().GetComponent<Rigidbody2D> ().Sleep ();
+		} else {
+			FindObjectOfType<PlayerController> ().GetComponent<Rigidbody2D> ().WakeUp ();
 		}
 
-		if (_isGameActive) {
+		IsGamePaused = !IsGamePaused;
+	}
+
+	// Update is called once per frame
+	void FixedUpdate () {	
+		if (!IsGameDisabled) {
+			AdMobPlugin.HideBannerView ();
 			_elapsedTime += Time.deltaTime;
 
 			if (_elapsedTime >= timeUntilSpawn) {

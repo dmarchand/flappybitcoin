@@ -16,6 +16,11 @@ public class ObstacleContainerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+		if (_gameplayController.IsGameDisabled) {
+			return;
+		}
+
 		Vector3 newPosition = new Vector3();
 		float currentSpeed = _scrollSpeed;
 		newPosition.Set(transform.position.x - Time.deltaTime * currentSpeed, transform.position.y, transform.position.z);

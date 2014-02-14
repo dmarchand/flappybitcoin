@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour {
 	private Rigidbody2D _rigidBody;
 	bool _isActive;
 	bool _buttonReleased;
+
+	GameplayController _gameplayController;
 	
 	// Use this for initialization
 	void Start () {
@@ -21,11 +23,12 @@ public class PlayerController : MonoBehaviour {
 		_isActive = false;
 		_rigidBody.Sleep ();
 		_buttonReleased = true;
+		_gameplayController = FindObjectOfType<GameplayController> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (!_isActive) {
+		if (_gameplayController.IsGameDisabled) {
 			return;
 		}
 
@@ -36,7 +39,7 @@ public class PlayerController : MonoBehaviour {
 
 
 
-		if (_buttonReleased && Input.GetButton ("Fire1")) {
+		if (_buttonReleased && Input.GetButton ("Fire1") && dfInputManager.ControlUnderMouse == null) {
 			this._rigidBody.velocity = new Vector2 (0, forcePerClick);
 			_buttonReleased = false;
 		} 
@@ -58,6 +61,8 @@ public class PlayerController : MonoBehaviour {
 		_isActive = true;
 		_rigidBody.WakeUp ();
 	}
+
+
 
 
 }
