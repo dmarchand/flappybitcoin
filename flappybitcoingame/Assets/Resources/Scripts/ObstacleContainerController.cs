@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ObstacleContainerController : MonoBehaviour {
 
-	float _scrollSpeed = .5f;
+	float _scrollSpeed = .7f;
 	bool _hasBeenScored;
 	GameplayController _gameplayController;
 

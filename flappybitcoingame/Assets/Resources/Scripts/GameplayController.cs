@@ -7,15 +7,18 @@ public class GameplayController : MonoBehaviour {
 	public ScalePair[] spriteScales;
 
 	bool _isGameActive;
+	bool _powerupEnabled;
 	
 	public float timeUntilSpawn;
 	float _elapsedTime = 0;
+	float _elapsedPowerupTime = 0;
 
 	public float gapHeight;
 	public float topPillarMaxOffset;
 	public int pickupSpawnChance;
 
 	public int score;
+	public float powerupTime;
 	
 	GameObject _enemyPillarPrefab;
 	GameObject _powerupPrefab;
@@ -48,6 +51,13 @@ public class GameplayController : MonoBehaviour {
 				SpawnDynamicObstacles();
 				SpawnPickups();
 			}
+
+			if(_powerupEnabled) {
+				_elapsedPowerupTime += Time.deltaTime;
+				if(_elapsedPowerupTime >= powerupTime) {
+					DisablePowerup();
+				}
+			}
 		}
 
 
@@ -55,9 +65,10 @@ public class GameplayController : MonoBehaviour {
 
 	void SpawnPickups() {
 		if (Random.Range (0, 100) > pickupSpawnChance) {
-			float yPosition = Random.Range(-20, 765) / 10;
+			float yPosition = Random.Range(-40, 40) / 10;
 
-			PowerupController topPillar = ((GameObject)(Instantiate(_enemyPillarPrefab, new Vector3(2, yPosition, 0), UnityEngine.Quaternion.identity))).GetComponent<PowerupController>();
+			PowerupController powerup = ((GameObject)(Instantiate(_powerupPrefab, new Vector3(4, yPosition, 0), UnityEngine.Quaternion.identity))).GetComponent<PowerupController>();
+			powerup.transform.parent = this.transform;
 		}
 	}
 
@@ -83,10 +94,25 @@ public class GameplayController : MonoBehaviour {
 		offset /= 10;
 		topPillar.transform.position = new Vector3 (topPillar.transform.position.x, topPillar.transform.position.y - offset, topPillar.transform.position.z);
 		bottomPillar.transform.position = new Vector3 (topPillar.transform.position.x, topPillar.transform.position.y - gapHeight - 6.5f, topPillar.transform.position.z);
-		
+
+		bottomPillar.transform.parent = this.transform;
+		topPillar.transform.parent = this.transform;
+
+		if (_powerupEnabled) {
+			BroadcastMessage("PowerupEnable");
+		}
 	}
 
+	void GetPowerup() {
+		BroadcastMessage ("PowerupEnable");
+		_elapsedPowerupTime = 0;
+		_powerupEnabled = true;
+	}
 
+	void DisablePowerup() {
+		BroadcastMessage ("PowerupDisable");
+		_powerupEnabled = false;
+	}
 
 	public void AddScore() {
 		score++;
